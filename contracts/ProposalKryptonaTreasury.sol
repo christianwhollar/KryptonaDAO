@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./KryptonaDAO.sol";
 import "./ProposalBase.sol";
+import "./KryptonaDAO.sol";
 
-contract ProposalKryptonaMember is ProposalBase {
+contract ProposalKryptonaTreasury is ProposalBase {
     KryptonaDAO public dao;
 
-    enum ProposalType { AddMember, RemoveMember }
-
-    struct MemberProposal {
+    enum ProposalType { TransferFunds }
+    struct TreasuryProposal {
         ProposalType proposalType;
-        address member;
+        address payable to;
+        uint256 amount;
     }
 
-    mapping(uint256 => MemberProposal) public memberProposals;
+    mapping(uint256 => TreasuryProposal) public treasuryProposals;
 
     constructor(address _dao) {
         dao = KryptonaDAO(_dao);
@@ -24,7 +24,7 @@ contract ProposalKryptonaMember is ProposalBase {
         require(_isProposalValid(proposalId), "Invalid or expired proposal");
 
         Proposal storage p = proposals[proposalId];
-        uint256 votingPower = dao.getVotingPower(msg.sender); // Assuming such a function exists
+        uint256 votingPower = dao.getVotingPower(msg.sender);
 
         if (support) {
             p.forVotes += votingPower;
@@ -35,26 +35,26 @@ contract ProposalKryptonaMember is ProposalBase {
         emit Voted(proposalId, msg.sender, support);
     }
 
-    function createMemberProposal(address _member, ProposalType _type) public {
+    function createTreasuryProposal(address payable _to, uint256 _amount, string memory description) public {
         require(dao.checkMembership(msg.sender), "Only DAO members can propose");
+        require(_amount > 0, "Invalid transfer amount");
 
         uint256 proposalId = nextProposalId;
-        createProposal(_type == ProposalType.AddMember ? "Add member" : "Remove member");
+        createProposal(description);
 
-        memberProposals[proposalId] = MemberProposal({
-            proposalType: _type,
-            member: _member
+        treasuryProposals[proposalId] = TreasuryProposal({
+            proposalType: ProposalType.TransferFunds,
+            to: _to,
+            amount: _amount
         });
+
+        emit ProposalCreated(proposalId, msg.sender);
     }
 
     function executeProposal(uint256 proposalId) public override {
         super.executeProposal(proposalId);
 
-        MemberProposal storage mp = memberProposals[proposalId];
-        if (mp.proposalType == ProposalType.AddMember) {
-            dao.addMember(mp.member);
-        } else if (mp.proposalType == ProposalType.RemoveMember) {
-            dao.removeMember(mp.member);
-        }
+        TreasuryProposal storage tp = treasuryProposals[proposalId];
+        dao.sendTreasuryFundsETH(tp.to, tp.amount);
     }
 }

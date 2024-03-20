@@ -5,6 +5,7 @@ describe("ProposalKryptonaMember", function () {
     let KryptonaDAO, kryptonaDAO, kryptonaDAOAddress;
     let ProposalKryptonaMember, proposalKryptonaMember, proposalKryptonaMemberAddress;
     let Kryptona, kryptona, kryptonaTokenAddress;
+    let KryptonaTreasury, kryptonaTreasury, kryptonaTreasuryAddress;
     let owner, addr1, addr2, addr3;
 
     beforeEach(async function () {
@@ -23,9 +24,16 @@ describe("ProposalKryptonaMember", function () {
         await kryptona.mint(addr2.address, 100);
         await kryptona.mint(addr3.address, 100);
 
+        // deploy kryptona treasury
+        KryptonaTreasury = await ethers.getContractFactory("KryptonaTreasury");
+        kryptonaTreasury = await KryptonaTreasury.deploy(kryptonaTokenAddress);
+        await kryptonaTreasury.waitForDeployment();
+
+        kryptonaTreasuryAddress = await kryptonaTreasury.getAddress();
+
         // Deploy KryptonaDAO contract with Kryptona token address
         KryptonaDAO = await ethers.getContractFactory("KryptonaDAO");
-        kryptonaDAO = await KryptonaDAO.deploy(kryptonaTokenAddress);
+        kryptonaDAO = await KryptonaDAO.deploy(kryptonaTokenAddress, kryptonaTreasuryAddress);
         await kryptonaDAO.waitForDeployment();
 
         kryptonaDAOAddress = await kryptonaDAO.getAddress()
@@ -53,17 +61,17 @@ describe("ProposalKryptonaMember", function () {
 
     it("Should execute an add member proposal successfully", async function () {
         await kryptonaDAO.addMember(addr1.address);
-    
-        await proposalKryptonaMember.connect(addr1).createMemberProposal(addr2.address, 0); // 0 for AddMember
+
+        await proposalKryptonaMember.connect(addr1).createMemberProposal(addr2.address, 0);
         const proposalId = await proposalKryptonaMember.nextProposalId() - 1n;
-    
+
         await proposalKryptonaMember.connect(addr1).vote(proposalId, true);
-    
-        await ethers.provider.send("evm_increaseTime", [7 * 24 * 60 * 60]);
-        await ethers.provider.send("evm_mine");
-    
+
+        await ethers.provider.send("evm_increaseTime", [7 * 24 * 60 * 60]); 
+        await ethers.provider.send("evm_mine"); 
+        
         await proposalKryptonaMember.connect(addr1).executeProposal(proposalId);
-    
+        
         const isMember = await kryptonaDAO.checkMembership(addr2.address);
         expect(isMember).to.equal(true);
     });
