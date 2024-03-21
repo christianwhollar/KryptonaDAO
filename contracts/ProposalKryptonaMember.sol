@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./KryptonaDAO.sol";
+import "./DAOKryptona.sol";
 import "./ProposalBase.sol";
 
 contract ProposalKryptonaMember is ProposalBase {
-    KryptonaDAO public dao;
+    DAOKryptona public dao;
 
     enum ProposalType { AddMember, RemoveMember }
 
@@ -17,7 +17,7 @@ contract ProposalKryptonaMember is ProposalBase {
     mapping(uint256 => MemberProposal) public memberProposals;
 
     constructor(address _dao) {
-        dao = KryptonaDAO(_dao);
+        dao = DAOKryptona(_dao);
     }
 
     function vote(uint256 proposalId, bool support) public override {

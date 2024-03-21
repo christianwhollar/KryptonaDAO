@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "./ProposalBase.sol";
-import "./KryptonaDAO.sol";
+import "./DAOKryptona.sol";
 
 contract ProposalKryptonaTreasury is ProposalBase {
-    KryptonaDAO public dao;
+    DAOKryptona public dao;
 
     enum ProposalType { TransferFunds }
     struct TreasuryProposal {
@@ -17,7 +17,7 @@ contract ProposalKryptonaTreasury is ProposalBase {
     mapping(uint256 => TreasuryProposal) public treasuryProposals;
 
     constructor(address _dao) {
-        dao = KryptonaDAO(_dao);
+        dao = DAOKryptona(_dao);
     }
 
     function vote(uint256 proposalId, bool support) public override {

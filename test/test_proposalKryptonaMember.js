@@ -32,7 +32,7 @@ describe("ProposalKryptonaMember", function () {
         kryptonaTreasuryAddress = await kryptonaTreasury.getAddress();
 
         // Deploy KryptonaDAO contract with Kryptona token address
-        KryptonaDAO = await ethers.getContractFactory("KryptonaDAO");
+        KryptonaDAO = await ethers.getContractFactory("DAOKryptona");
         kryptonaDAO = await KryptonaDAO.deploy(kryptonaTokenAddress, kryptonaTreasuryAddress);
         await kryptonaDAO.waitForDeployment();
 
