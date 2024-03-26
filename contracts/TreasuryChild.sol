@@ -59,10 +59,10 @@ contract TreasuryChild is Ownable {
         require(amount > 0, "Withdrawal amount must be greater than 0");
         uint256 fee = amount / 100; // 1% fee
         uint256 amountAfterFee = amount - fee;
-
+        uint256 balance = getETHBalance();
         require(
-            address(this).balance >= amount,
-            "Insufficient balance to withdraw"
+            balance >= amount,
+            string(abi.encodePacked("Insufficient balance to withdraw", toString(balance)))
         );
 
         // Send the fee to the parent treasury
@@ -84,5 +84,24 @@ contract TreasuryChild is Ownable {
 
     function getKryptonaTokenBalance() public view returns (uint256) {
         return kryptonaToken.balanceOf(address(this));
+    }
+
+    function toString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
     }
 }

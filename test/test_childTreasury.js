@@ -1,6 +1,5 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { parse } = require("path");
 
 describe("TreasuryChild", function (){
     let provider;

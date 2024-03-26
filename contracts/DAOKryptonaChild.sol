@@ -6,11 +6,15 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./KryptonaTreasury.sol";
 import "./TreasuryChild.sol";
+import "./Model.sol";
 
 contract DAOKryptonaChild is Ownable {
+
     ERC20 public kryptonaToken;
     KryptonaTreasury public kryptonaTreasury;
     TreasuryChild public childTreasury;
+    AIModel public model;
+    string private tokenURI;
     address public proposalContract;
     
     struct Member {
@@ -24,6 +28,8 @@ contract DAOKryptonaChild is Ownable {
     event MemberAdded(address member);
     event MemberRemoved(address member);
     event TreasuryFunded(uint256 amount);
+    event ModelAdded();
+    event ModelUpdated();
 
     constructor(address _kryptonaTokenAddress, address payable _kryptonaTreasury) Ownable(msg.sender) {
         kryptonaToken = ERC20(_kryptonaTokenAddress);
@@ -64,7 +70,8 @@ contract DAOKryptonaChild is Ownable {
 
     function contributeToTreasuryETH() public payable {
         require(msg.value > 0, "Must send ETH to contribute");
-        childTreasury.depositEther();
+        (bool sent, ) = address(childTreasury).call{value: msg.value}("");
+        require(sent, "Failed to send ETH to treasury");
     }
 
     function sendTreasuryFundsETH(
@@ -72,6 +79,28 @@ contract DAOKryptonaChild is Ownable {
         uint256 _amount
     ) public onlyProposalContractOrOwner {
         childTreasury.withdrawEther(_to, _amount);
+    }
+
+    function getETHBalance() public view returns (uint256) {
+        return childTreasury.getETHBalance();
+    }
+
+    function addModel(string memory _tokenURI) public onlyProposalContractOrOwner {
+        require(address(model) == address(0), "Model is already assigned.");
+        tokenURI = _tokenURI;
+        model = new AIModel();
+        model.mintNFT(address(this), _tokenURI);
+        
+    }
+
+    function updateModel(string memory _tokenURI) public onlyProposalContractOrOwner {
+        require(address(model) != address(0), "Model does not exist.");
+        tokenURI = _tokenURI;
+        model.mintNFT(address(this), _tokenURI);
+    }
+
+    function getTokenURI() external view returns (string memory) {
+        return tokenURI;
     }
 
     function toString(uint256 value) internal pure returns (string memory) {
