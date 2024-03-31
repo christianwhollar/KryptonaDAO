@@ -4,15 +4,15 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./KryptonaTreasury.sol";
-import "./TreasuryChild.sol";
+import "./DAOKryptonaTreasury.sol";
+import "./DAOKryptonaChildTreasury.sol";
 import "./Model.sol";
 
 contract DAOKryptonaChild is Ownable {
 
     ERC20 public kryptonaToken;
-    KryptonaTreasury public kryptonaTreasury;
-    TreasuryChild public childTreasury;
+    DAOKryptonaTreasury public kryptonaTreasury;
+    DAOKryptonaChildTreasury public childTreasury;
     AIModel public model;
     string private tokenURI;
     address public proposalContract;
@@ -33,8 +33,8 @@ contract DAOKryptonaChild is Ownable {
 
     constructor(address _kryptonaTokenAddress, address payable _kryptonaTreasury) Ownable(msg.sender) {
         kryptonaToken = ERC20(_kryptonaTokenAddress);
-        kryptonaTreasury = new KryptonaTreasury(_kryptonaTreasury);
-        childTreasury = new TreasuryChild(_kryptonaTokenAddress, _kryptonaTreasury);
+        kryptonaTreasury = new DAOKryptonaTreasury(_kryptonaTreasury);
+        childTreasury = new DAOKryptonaChildTreasury(_kryptonaTokenAddress, _kryptonaTreasury);
     }
 
     function setProposalContract(address _proposalContract) public onlyOwner {

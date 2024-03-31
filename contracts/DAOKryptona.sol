@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./KryptonaTreasury.sol";
+import "./DAOKryptonaTreasury.sol";
 
 contract DAOKryptona is Ownable {
     ERC20 public kryptonaToken;
-    KryptonaTreasury public treasury;
+    DAOKryptonaTreasury public treasury;
     address public proposalContract;
 
     struct Member {
@@ -28,7 +28,7 @@ contract DAOKryptona is Ownable {
         address _treasury
     ) Ownable(msg.sender) {
         kryptonaToken = ERC20(_kryptonaTokenAddress);
-        treasury = new KryptonaTreasury(_treasury);
+        treasury = new DAOKryptonaTreasury(_treasury);
     }
 
     function setProposalContract(address _proposalContract) public onlyOwner {

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract KryptonaTreasury is Ownable {
+contract DAOKryptonaTreasury is Ownable {
     ERC20 public kryptonaToken;
 
     constructor(address _kryptonaTokenAddress) Ownable(msg.sender) {

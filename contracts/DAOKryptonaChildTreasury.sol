@@ -3,13 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./KryptonaTreasury.sol";
+import "./DAOKryptonaTreasury.sol";
 
-contract TreasuryChild is Ownable {
+contract DAOKryptonaChildTreasury is Ownable {
     ERC20 public kryptonaToken;
 
     // The parent treasury to interact with
-    KryptonaTreasury public parentTreasury;
+    DAOKryptonaTreasury public parentTreasury;
 
     // Event declarations for logging activities
     event EtherDeposited(
@@ -29,7 +29,7 @@ contract TreasuryChild is Ownable {
         address payable _parentTreasuryAddress
     ) Ownable(msg.sender) {
         kryptonaToken = ERC20(_kryptonaTokenAddress);
-        parentTreasury = KryptonaTreasury(_parentTreasuryAddress);
+        parentTreasury = DAOKryptonaTreasury(_parentTreasuryAddress);
     }
 
     // Fallback function to accept ETH deposits directly

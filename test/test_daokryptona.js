@@ -1,14 +1,14 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("DAOKryptonaChild", function () {
+describe("KryptonaDAO", function () {
+
     let KryptonaDAO, kryptonaDAO;
     let Kryptona, kryptona, kryptonaTokenAddress;
     let KryptonaTreasury, kryptonaTreasury, kryptonaTreasuryAddress;
-    let KryptonaChildDAO, kryptonaChildDAO;
     let owner, addr1, addr2;
 
-    this.beforeEach(async function () {
+    beforeEach(async function () {
         [owner, addr1, addr2] = await ethers.getSigners();
 
         // Deploy Kryptona token contract
@@ -24,7 +24,7 @@ describe("DAOKryptonaChild", function () {
         await kryptona.mint(addr2.address, 100);
 
         //
-        KryptonaTreasury = await ethers.getContractFactory("KryptonaTreasury");
+        KryptonaTreasury = await ethers.getContractFactory("DAOKryptonaTreasury");
         kryptonaTreasury = await KryptonaTreasury.deploy(kryptonaTokenAddress);
         await kryptonaTreasury.waitForDeployment();
 
@@ -34,19 +34,14 @@ describe("DAOKryptonaChild", function () {
         KryptonaDAO = await ethers.getContractFactory("DAOKryptona");
         kryptonaDAO = await KryptonaDAO.deploy(kryptonaTokenAddress, kryptonaTreasuryAddress);
         await kryptonaDAO.waitForDeployment();
-
-        //
-        KryptonaChildDAO = await ethers.getContractFactory("DAOKryptonaChild");
-        kryptonaChildDAO = await KryptonaChildDAO.deploy(kryptonaTokenAddress, kryptonaTreasuryAddress);
-        await kryptonaChildDAO.waitForDeployment();
     });
 
     it("Should add a member successfully", async function () {
         // add addr1 as a member
-        await kryptonaChildDAO.addMember(addr1.address);
+        await kryptonaDAO.addMember(addr1.address);
 
         // get member struct by address
-        const member = await kryptonaChildDAO.members(addr1.address);
+        const member = await kryptonaDAO.members(addr1.address);
 
         // verify addr1 is a member of kryptona dao
         expect(member.isMember).to.equal(true);
@@ -54,15 +49,15 @@ describe("DAOKryptonaChild", function () {
 
     it("Should remove a member successfully", async function () {
         // add addr1 as a member
-        await kryptonaChildDAO.addMember(addr1.address);
-        let member = await kryptonaChildDAO.members(addr1.address);
+        await kryptonaDAO.addMember(addr1.address);
+        let member = await kryptonaDAO.members(addr1.address);
 
         // verify addr1 is a member of kryptona dao
         expect(member.isMember).to.equal(true);
 
         // remove addr1 as a member
-        await kryptonaChildDAO.removeMember(addr1.address);
-        member = await kryptonaChildDAO.members(addr1.address);
+        await kryptonaDAO.removeMember(addr1.address);
+        member = await kryptonaDAO.members(addr1.address);
 
         // verify addr1 removal
         expect(member.isMember).to.equal(false);
@@ -71,7 +66,7 @@ describe("DAOKryptonaChild", function () {
     it("Should not allow non-owner to add members", async function () {
         try {
             // attempt to add addr1 as a member by addr2
-            await kryptonaChildDAO.connect(addr1).addMember(addr2.address);
+            await kryptonaDAO.connect(addr1).addMember(addr2.address);
 
             // fail expected
             expect.fail("Transaction did not revert with any error");
@@ -83,10 +78,10 @@ describe("DAOKryptonaChild", function () {
 
     it("Verify voting power of added member", async function () {
         // add addr1 as a member
-        await kryptonaChildDAO.addMember(addr1.address);
+        await kryptonaDAO.addMember(addr1.address);
 
         // get member struct by address
-        const member = await kryptonaChildDAO.members(addr1.address);
+        const member = await kryptonaDAO.members(addr1.address);
 
         // get kryptona balance of addr1
         const balance = await kryptona.balanceOf(addr1.address)
