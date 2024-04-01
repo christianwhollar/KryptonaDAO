@@ -20,13 +20,13 @@ describe("TreasuryChild", function (){
         // get token address
         kryptonaTokenAddress = await kryptona.getAddress()
 
-        KryptonaTreasury = await ethers.getContractFactory("KryptonaTreasury");
+        KryptonaTreasury = await ethers.getContractFactory("DAOKryptonaTreasury");
         kryptonaTreasury = await KryptonaTreasury.deploy(kryptonaTokenAddress);
         await kryptonaTreasury.waitForDeployment();
 
         kryptonaTreasuryAddress = kryptonaTreasury.getAddress();
 
-        ChildTreasury = await ethers.getContractFactory("TreasuryChild");
+        ChildTreasury = await ethers.getContractFactory("DAOKryptonaChildTreasury");
         childTreasury = await ChildTreasury.deploy(kryptonaTokenAddress, kryptonaTreasuryAddress);
         await childTreasury.waitForDeployment();
 

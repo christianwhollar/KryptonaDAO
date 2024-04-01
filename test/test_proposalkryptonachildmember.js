@@ -26,7 +26,7 @@ describe("ProposalKryptonaChildMember", function () {
         await kryptona.mint(addr3.address, 100);
 
         //
-        KryptonaTreasury = await ethers.getContractFactory("KryptonaTreasury");
+        KryptonaTreasury = await ethers.getContractFactory("DAOKryptonaTreasury");
         kryptonaTreasury = await KryptonaTreasury.deploy(kryptonaTokenAddress);
         await kryptonaTreasury.waitForDeployment();
 

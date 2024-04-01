@@ -19,7 +19,7 @@ describe("KryptonaTreasury:", function (){
         // get token address
         kryptonaTokenAddress = await kryptona.getAddress()
 
-        KryptonaTreasury = await ethers.getContractFactory("KryptonaTreasury");
+        KryptonaTreasury = await ethers.getContractFactory("DAOKryptonaTreasury");
         kryptonaTreasury = await KryptonaTreasury.deploy(kryptonaTokenAddress);
         await kryptonaTreasury.waitForDeployment();
 
